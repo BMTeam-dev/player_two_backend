@@ -1,0 +1,22 @@
+{
+  "minAppVersion": "0.0.1",
+  "activeGameIds": ["valorant", "lol", "cs2"],
+  "maxActiveListingsPerUser": 3,
+  "sessionRequestTtlMinutes": { "now": 15, "scheduled": 720 },
+  "availabilityNowTtlMinutes": 120,
+  "autoCompleteAfterHours": 24,
+  "reviewWindowDays": 7,
+  "rateLimits": {
+    "sessionRequestsPerHour": 20,
+    "messagesPerMinute": 30,
+    "reportsPerDay": 10
+  },
+  "searchWeights": {
+    "availability": 40,
+    "online": 20,
+    "rankProximity": 15,
+    "rating": 15,
+    "completionRate": 10
+  },
+  "termsVersion": "2026-10-v1"
+}

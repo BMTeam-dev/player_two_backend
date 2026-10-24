@@ -1,0 +1,22 @@
+node_modules/
+functions/lib/
+
+# Dados locais do emulador (npm run emulators exporta aqui ao sair)
+.emulator-data/
+
+# Logs do Firebase CLI / emuladores
+firebase-debug.log
+firebase-debug.*.log
+firestore-debug.log
+database-debug.log
+ui-debug.log
+pubsub-debug.log
+
+# Credenciais - NUNCA versionar chave de service account
+*serviceAccount*.json
+*-sa.json
+.env
+.env.*
+*.local
+
+.DS_Store

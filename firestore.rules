@@ -1,0 +1,268 @@
+rules_version = '2';
+
+// Princípio (MVP.md, seção 3.2): o cliente lê direto, mas só ESCREVE direto
+// no que é dele (próprio perfil, próprios jogos, mensagens, denúncias). Tudo
+// que envolve outra pessoa passa por Cloud Function, que usa o Admin SDK e
+// ignora estas regras - por isso quase todo `allow write` aqui é `false`.
+//
+// Usuário banido/suspenso: a Function de moderação desabilita a conta no
+// Auth e revoga os tokens. Atenção: as regras NÃO checam revogação, então o
+// ID token já emitido continua passando em `signedIn()` por até 1h. Por isso
+// a mesma Function tranca as conversas (`lockedAt`) e esconde os cartões -
+// é isso que corta o contato na hora. Não checamos `users/{uid}.status`
+// aqui para não cobrar um get() extra em cada requisição.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ------------------------------------------------------------ helpers
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isUser(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function changedKeys() {
+      return incoming().diff(resource.data).affectedKeys();
+    }
+
+    function isStr(v, minLen, maxLen) {
+      return v is string && v.size() >= minLen && v.size() <= maxLen;
+    }
+
+    function isOptStr(v, maxLen) {
+      return v == null || (v is string && v.size() <= maxLen);
+    }
+
+    function isListIn(v, allowed, maxSize) {
+      return v is list && v.size() <= maxSize && v.toSet().difference(allowed.toSet()).size() == 0;
+    }
+
+    function platforms() { return ['pc', 'playstation', 'xbox', 'switch', 'mobile']; }
+    function languages() { return ['pt', 'en', 'es']; }
+    function objectives() { return ['casual', 'ranked', 'coop', 'party', 'coaching', 'companion']; }
+    function playstyles() { return ['chill', 'tryhard', 'teaching', 'funny', 'strategic', 'silent']; }
+
+    // Avatar só do próprio Storage (avatars/{uid}/...): sem isso o cliente
+    // poderia apontar para qualquer imagem externa, fugindo do limite de
+    // tipo/tamanho do storage.rules e da moderação.
+    function isOwnAvatarUrl(v, uid) {
+      return v == null
+        || (v is string && v.size() <= 500
+            && v.matches('https://firebasestorage[.]googleapis[.]com/v0/b/[^/]+/o/avatars%2F' + uid + '%2F.+'));
+    }
+
+    // O cliente grava a disponibilidade direto (sem callable), então os
+    // prazos são limitados aqui; senão um "agora" com expiresAt daqui a um
+    // ano ficaria no topo da busca para sempre. Os limites espelham
+    // MVP.md 6.2 / config/app.availabilityNowTtlMinutes (120 min + folga de
+    // relógio) - ler config/app aqui custaria um get() por escrita.
+    function validAvailability(a) {
+      return a is map
+        && a.keys().hasOnly(['state', 'gameIds', 'windowStart', 'windowEnd', 'expiresAt', 'note'])
+        && a.keys().hasAll(['state', 'gameIds', 'windowStart', 'windowEnd', 'expiresAt', 'note'])
+        && a.gameIds is list && a.gameIds.size() <= 10
+        && isOptStr(a.note, 120)
+        && (
+          (a.state == 'offline'
+            && a.expiresAt == null && a.windowStart == null && a.windowEnd == null)
+          || (a.state == 'now'
+            && a.expiresAt is timestamp && a.expiresAt <= request.time + duration.value(125, 'm')
+            && a.windowStart == null && a.windowEnd == null)
+          || (a.state == 'today'
+            && a.expiresAt is timestamp && a.expiresAt <= request.time + duration.value(24, 'h')
+            && a.windowStart == null && a.windowEnd == null)
+          || (a.state == 'window'
+            && a.windowStart is timestamp && a.windowEnd is timestamp
+            && a.windowStart < a.windowEnd
+            && a.windowEnd <= request.time + duration.value(7, 'd')
+            && a.expiresAt == a.windowEnd)
+        );
+    }
+
+    // ------------------------------------------------- catálogo e config
+
+    // Público: o app checa `minAppVersion` antes do login.
+    match /config/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /games/{gameId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    // Só leitura: o app consulta se um username está livre; a reserva é
+    // feita pela Function completeOnboarding (em transaction).
+    match /usernames/{username} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    // ------------------------------------------------------------ usuários
+
+    match /users/{uid} {
+      allow read: if signedIn();
+      // Criação via completeOnboarding (valida idade e reserva username).
+      allow create, delete: if false;
+      // Espelha USER_EDITABLE_FIELDS em functions/src/types.ts.
+      allow update: if isUser(uid)
+        && changedKeys().hasOnly(['displayName', 'avatarUrl', 'bio', 'region', 'languages',
+                                  'platforms', 'hasMic', 'playstyles', 'availability'])
+        && isStr(incoming().displayName, 2, 30)
+        && isOwnAvatarUrl(incoming().avatarUrl, uid)
+        && isOptStr(incoming().bio, 300)
+        && isOptStr(incoming().region, 2)
+        && isListIn(incoming().languages, languages(), 3)
+        && isListIn(incoming().platforms, platforms(), 5)
+        && incoming().hasMic is bool
+        && isListIn(incoming().playstyles, playstyles(), 6)
+        && validAvailability(incoming().availability);
+
+      match /private/{docId} {
+        allow read: if isUser(uid);
+        allow create, delete: if false;
+        allow update: if isUser(uid)
+          && changedKeys().hasOnly(['fcmTokens', 'notificationPrefs'])
+          && incoming().fcmTokens is list && incoming().fcmTokens.size() <= 10
+          && incoming().notificationPrefs is map;
+      }
+
+      // `rankOrder` aqui é só tipo-checado: o trigger de PlayerGame recalcula
+      // a partir de games/{gameId}.ranks antes de copiar para o searchCard,
+      // então um valor adulterado nunca chega à busca.
+      match /games/{gameId} {
+        allow read: if signedIn();
+        allow delete: if isUser(uid);
+        allow create, update: if isUser(uid)
+          && incoming().keys().hasOnly(['gameId', 'rankId', 'rankOrder', 'roles', 'objectives',
+                                        'platforms', 'isMain', 'inGameNick', 'updatedAt'])
+          && incoming().gameId == gameId
+          && exists(/databases/$(database)/documents/games/$(gameId))
+          && isStr(incoming().rankId, 1, 40)
+          && incoming().rankOrder is int
+          && incoming().roles is list && incoming().roles.size() <= 5
+          && isListIn(incoming().objectives, objectives(), 6)
+          && isListIn(incoming().platforms, platforms(), 5)
+          && incoming().isMain is bool
+          && isOptStr(incoming().get('inGameNick', null), 40)
+          && incoming().updatedAt == request.time;
+      }
+
+      // Bloqueio via Function blockUser (tranca conversas, cancela pedidos).
+      match /blocks/{targetUid} {
+        allow read: if isUser(uid);
+        allow write: if false;
+      }
+    }
+
+    // ------------------------------------------------------------- busca
+
+    // Consultas de lista PRECISAM filtrar `visible == true`, senão o
+    // Firestore recusa a query inteira (regras não filtram resultados).
+    match /searchCards/{cardId} {
+      allow read: if signedIn() && resource.data.visible == true;
+      allow write: if false;
+    }
+
+    match /listings/{listingId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    // v0.1 - já protegido para não ficar aberto quando chegar.
+    match /lfgPosts/{postId} {
+      allow read: if signedIn();
+      allow write: if false;
+
+      match /members/{memberUid} {
+        allow read: if signedIn();
+        allow write: if false;
+      }
+    }
+
+    // ------------------------------------------------------------ sessões
+
+    match /sessions/{sessionId} {
+      allow read: if signedIn() && request.auth.uid in resource.data.participantIds;
+      allow write: if false;
+
+      match /events/{eventId} {
+        allow read: if signedIn()
+          && request.auth.uid in get(/databases/$(database)/documents/sessions/$(sessionId)).data.participantIds;
+        allow write: if false;
+      }
+    }
+
+    // --------------------------------------------------------------- chat
+
+    match /conversations/{conversationId} {
+      allow read: if signedIn() && request.auth.uid in resource.data.participantIds;
+      allow create, delete: if false;
+      // Única escrita do cliente: zerar o PRÓPRIO contador ao abrir o chat
+      // (`unread.<uid> = 0`). O incremento é do trigger de Message; sem isso,
+      // marcar como lida exigiria uma callable a cada abertura de conversa.
+      allow update: if signedIn()
+        && request.auth.uid in resource.data.participantIds
+        && changedKeys().hasOnly(['unread'])
+        && incoming().unread.diff(resource.data.unread).affectedKeys().hasOnly([request.auth.uid])
+        && incoming().unread[request.auth.uid] == 0;
+
+      match /messages/{messageId} {
+        function conversation() {
+          return get(/databases/$(database)/documents/conversations/$(conversationId)).data;
+        }
+
+        allow read: if signedIn() && request.auth.uid in conversation().participantIds;
+
+        // Cliente só cria mensagem de texto própria; mensagens de sistema e
+        // a marcação `flagged` são das Functions. Sem edição nem exclusão:
+        // o histórico é evidência em denúncias.
+        allow create: if signedIn()
+          && request.auth.uid in conversation().participantIds
+          && conversation().lockedAt == null
+          && incoming().keys().hasOnly(['id', 'senderId', 'type', 'text', 'systemEvent', 'flagged', 'createdAt'])
+          && incoming().id == messageId
+          && incoming().senderId == request.auth.uid
+          && incoming().type == 'text'
+          && isStr(incoming().text, 1, 1000)
+          && incoming().systemEvent == null
+          && incoming().flagged == false
+          && incoming().createdAt == request.time;
+        allow update, delete: if false;
+      }
+    }
+
+    // --------------------------------------------------------- avaliações
+
+    // Avaliação cega: fica invisível até os dois lados avaliarem ou passar
+    // o prazo; o autor sempre vê a própria.
+    match /reviews/{reviewId} {
+      allow read: if signedIn()
+        && (resource.data.visible == true || resource.data.authorId == request.auth.uid);
+      allow write: if false;
+    }
+
+    // ------------------------------------------------------------- denúncias
+
+    // Via Function submitReport: só ela consegue aplicar o limite diário
+    // (config/app.rateLimits.reportsPerDay), checar que as mensagens da
+    // evidência são de uma conversa da qual o denunciante participa e
+    // calcular `priority`. Denúncia em massa é vetor de assédio.
+    match /reports/{reportId} {
+      allow read, write: if false;
+    }
+
+    match /moderationActions/{actionId} {
+      allow read, write: if false;
+    }
+  }
+}

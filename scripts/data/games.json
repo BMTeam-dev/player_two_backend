@@ -1,0 +1,81 @@
+[
+  {
+    "id": "valorant",
+    "name": "Valorant",
+    "iconUrl": null,
+    "platforms": ["pc"],
+    "ranks": [
+      { "id": "iron", "label": "Ferro", "order": 1 },
+      { "id": "bronze", "label": "Bronze", "order": 2 },
+      { "id": "silver", "label": "Prata", "order": 3 },
+      { "id": "gold", "label": "Ouro", "order": 4 },
+      { "id": "platinum", "label": "Platina", "order": 5 },
+      { "id": "diamond", "label": "Diamante", "order": 6 },
+      { "id": "ascendant", "label": "Ascendente", "order": 7 },
+      { "id": "immortal", "label": "Imortal", "order": 8 },
+      { "id": "radiant", "label": "Radiante", "order": 9 }
+    ],
+    "roles": [
+      { "id": "duelist", "label": "Duelista" },
+      { "id": "initiator", "label": "Iniciador" },
+      { "id": "controller", "label": "Controlador" },
+      { "id": "sentinel", "label": "Sentinela" }
+    ],
+    "maxPartySize": 5,
+    "active": true,
+    "sortOrder": 1
+  },
+  {
+    "id": "lol",
+    "name": "League of Legends",
+    "iconUrl": null,
+    "platforms": ["pc"],
+    "ranks": [
+      { "id": "iron", "label": "Ferro", "order": 1 },
+      { "id": "bronze", "label": "Bronze", "order": 2 },
+      { "id": "silver", "label": "Prata", "order": 3 },
+      { "id": "gold", "label": "Ouro", "order": 4 },
+      { "id": "platinum", "label": "Platina", "order": 5 },
+      { "id": "emerald", "label": "Esmeralda", "order": 6 },
+      { "id": "diamond", "label": "Diamante", "order": 7 },
+      { "id": "master", "label": "Mestre", "order": 8 },
+      { "id": "grandmaster", "label": "Grão-Mestre", "order": 9 },
+      { "id": "challenger", "label": "Desafiante", "order": 10 }
+    ],
+    "roles": [
+      { "id": "top", "label": "Topo" },
+      { "id": "jungle", "label": "Selva" },
+      { "id": "mid", "label": "Meio" },
+      { "id": "adc", "label": "Atirador" },
+      { "id": "support", "label": "Suporte" }
+    ],
+    "maxPartySize": 5,
+    "active": true,
+    "sortOrder": 2
+  },
+  {
+    "id": "cs2",
+    "name": "Counter-Strike 2",
+    "iconUrl": null,
+    "platforms": ["pc"],
+    "ranks": [
+      { "id": "premier_grey", "label": "Premier 0–4.999", "order": 1 },
+      { "id": "premier_lightblue", "label": "Premier 5.000–9.999", "order": 2 },
+      { "id": "premier_blue", "label": "Premier 10.000–14.999", "order": 3 },
+      { "id": "premier_purple", "label": "Premier 15.000–19.999", "order": 4 },
+      { "id": "premier_pink", "label": "Premier 20.000–24.999", "order": 5 },
+      { "id": "premier_red", "label": "Premier 25.000–29.999", "order": 6 },
+      { "id": "premier_gold", "label": "Premier 30.000+", "order": 7 }
+    ],
+    "roles": [
+      { "id": "entry", "label": "Entry" },
+      { "id": "awper", "label": "AWPer" },
+      { "id": "support", "label": "Suporte" },
+      { "id": "lurker", "label": "Lurker" },
+      { "id": "igl", "label": "IGL" }
+    ],
+    "maxPartySize": 5,
+    "active": true,
+    "sortOrder": 3
+  }
+]
