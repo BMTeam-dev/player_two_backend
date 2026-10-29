@@ -121,8 +121,10 @@ service cloud.firestore {
         && isOwnAvatarUrl(incoming().avatarUrl, uid)
         && isOptStr(incoming().bio, 300)
         && isOptStr(incoming().region, 2)
-        && isListIn(incoming().languages, languages(), 3)
-        && isListIn(incoming().platforms, platforms(), 5)
+        // Pelo menos 1 idioma e 1 plataforma: são filtros da busca, e um
+        // perfil sem nenhum some de qualquer combinação de filtros.
+        && isListIn(incoming().languages, languages(), 3) && incoming().languages.size() >= 1
+        && isListIn(incoming().platforms, platforms(), 5) && incoming().platforms.size() >= 1
         && incoming().hasMic is bool
         && isListIn(incoming().playstyles, playstyles(), 6)
         && validAvailability(incoming().availability);
