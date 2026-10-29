@@ -1,12 +1,8 @@
-import { setGlobalOptions } from 'firebase-functions/v2';
-
-// Mesma região do Firestore (southamerica-east1). Exceção futura: o trigger
-// de presença precisa ficar na região da instância do Realtime Database,
-// que não existe em São Paulo - ver MVP.md, seção 7.2.
-//
-// `maxInstances` limita quantas instâncias uma Function pode escalar: teto
-// de custo caso um bug (ex: trigger em loop) dispare chamadas demais.
-setGlobalOptions({ region: 'southamerica-east1', maxInstances: 10 });
+// Precisa ser o PRIMEIRO import: em ES modules, todo `export ... from` abaixo
+// é avaliado antes do corpo deste arquivo, então um setGlobalOptions() escrito
+// aqui rodaria depois das Functions já definidas - e elas iriam para a região
+// padrão (us-central1). Aconteceu no primeiro deploy, em 29/10/2026.
+import './globalOptions.js';
 
 // As Functions entram aqui bloco a bloco (TASKS.md).
 export { completeOnboarding } from './users/completeOnboarding.js';
