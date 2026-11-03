@@ -7,3 +7,4 @@ import './globalOptions.js';
 // As Functions entram aqui bloco a bloco (TASKS.md).
 export { completeOnboarding } from './users/completeOnboarding.js';
 export { expireAvailability } from './availability/expireAvailability.js';
+export { onPresenceWritten } from './presence/onPresenceWritten.js';
