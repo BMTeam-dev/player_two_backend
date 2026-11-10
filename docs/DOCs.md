@@ -3,8 +3,8 @@
 Documentação técnica do repositório `player-2-backend`: o que existe, como
 cada parte funciona passo a passo e por que foi feita desse jeito.
 
-> **Estado documentado:** branch `feat/search-cards`, commit `3d7b6da`
-> (10/11/2026). Cobre as tarefas 1–18 do `TASKS.md` do app.
+> **Estado documentado:** branch `main`, commit `6e743bc` (10/11/2026).
+> Cobre as tarefas 1–18 do `TASKS.md` do app.
 > Quando o código mudar, atualize o arquivo correspondente.
 
 ## O que é este repositório, em um parágrafo
@@ -79,8 +79,8 @@ flowchart LR
 | `onPlayerGameWrittenSyncCards` | trigger Firestore | southamerica-east1 | escrita em `users/{uid}/games/{gameId}` | [8](08-functions-searchCards.md) |
 | `onListingWrittenSyncCards` | trigger Firestore | southamerica-east1 | escrita em `listings/{id}` | [8](08-functions-searchCards.md) |
 
-> As três de `searchCards` estão nesta branch e ainda **não foram publicadas**
-> (ver [Operação e deploy](11-operacao-e-deploy.md)).
+> As três de `searchCards` foram publicadas em 10/11/2026, e os cartões de
+> quem já tinha perfil foram recalculados (ver [Operação e deploy](11-operacao-e-deploy.md)).
 
 ## Documentos relacionados (repo do app)
 

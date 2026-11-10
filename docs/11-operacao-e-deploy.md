@@ -62,12 +62,20 @@ npm run typecheck && npm test
 4. **Scripts de correção** (`db:rebuild-cards`), se necessário.
 5. **App**, por último.
 
-### Primeiro deploy de `searchCards` (pendente)
+### Primeiro deploy de `searchCards` (feito em 10/11/2026)
 
-1. `npm run db:deploy`: publica os índices de `searchCards`.
+Fica como roteiro para Functions que dependem de dados já existentes:
+
+1. Conferir os índices. Os 15 do `firestore.indexes.json` já estavam
+   publicados, então o `db:deploy` não foi necessário.
 2. `npx firebase deploy --only functions:onUserWrittenSyncCards,functions:onPlayerGameWrittenSyncCards,functions:onListingWrittenSyncCards`.
 3. `npm run db:rebuild-cards`: cria os cartões de quem já tem perfil.
-4. Conferir no Console que `searchCards` tem um documento por jogo de perfil.
+   Resultado: 1 usuário, 1 cartão gravado, `gameIds` corrigido em 1.
+
+O `db:rebuild-cards` exige as credenciais padrão do gcloud
+(`gcloud auth application-default login`). Na tela de consentimento do
+Google, a permissão do Google Cloud (`cloud-platform`) precisa estar
+marcada. Sem ela, o login falha com `scope is required but not consented`.
 
 ## 11.3 Conferir em produção
 
@@ -80,20 +88,16 @@ npm run typecheck && npm test
 
 ## 11.4 Branches
 
-As branches são empilhadas, uma por bloco do `TASKS.md`:
+A `main` é a branch padrão e a única permanente. Ela tem tudo o que está
+publicado.
 
-```text
-main ─ feat/availability ─ feat/presence ─ feat/search-cards
-```
+Cada trabalho novo sai da `main` numa branch própria (`feat/<nome>`,
+`docs/<nome>`), com PR de volta para a `main`. Depois do merge, apague a
+branch, local e remota.
 
-| Branch | Último commit | Conteúdo |
-|---|---|---|
-| `main` | `9b4df28` | commit inicial (regras, índices, scripts) |
-| `feat/availability` | `906e969` | `completeOnboarding`, correção de região, `expireAvailability` |
-| `feat/presence` | `55a50fb` | `onPresenceWritten` |
-| `feat/search-cards` | `3d7b6da` | `searchCards` + janela de disponibilidade |
-
-O PR de cada branch aponta para a anterior.
+As tarefas 1–18 foram feitas em branches empilhadas (`feat/availability`,
+`feat/presence`, `feat/search-cards`). Essas branches foram mergeadas por
+squash na `main` (PRs #1, #5 e #6) e apagadas em 10/11/2026.
 
 ## 11.5 Custos e limites
 

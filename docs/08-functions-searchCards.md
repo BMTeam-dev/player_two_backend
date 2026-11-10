@@ -9,7 +9,7 @@
 | Arquivos | `functions/src/search/syncSearchCards.ts` (adaptadores), `functions/src/search/cards.ts` (lógica) |
 | Testes | `test/searchCards.test.ts` |
 | Escreve | `searchCards/{uid}_{gameId}` e `users/{uid}.gameIds` |
-| Estado | nesta branch, **ainda não publicadas** |
+| Estado | publicadas em 10/11/2026 |
 
 ## 8.1 Para que servem
 
