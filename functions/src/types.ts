@@ -401,6 +401,7 @@ export type SystemEvent =
   | 'session_requested'
   | 'session_accepted'
   | 'session_declined'
+  | 'session_expired'
   | 'session_cancelled'
   | 'session_completed'
   | 'session_no_show'

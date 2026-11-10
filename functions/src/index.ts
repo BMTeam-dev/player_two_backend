@@ -24,3 +24,4 @@ export {
   requestSession,
   startSession,
 } from './sessions/sessionCallables.js';
+export { autoAdvanceSessions, autoCompleteSessions, expireSessionRequests } from './sessions/scheduledSessions.js';
