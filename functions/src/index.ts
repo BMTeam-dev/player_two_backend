@@ -14,3 +14,13 @@ export {
   onPlayerGameWrittenSyncCards,
   onUserWrittenSyncCards,
 } from './search/syncSearchCards.js';
+export {
+  acceptSession,
+  cancelSession,
+  confirmSession,
+  declineSession,
+  markSessionDone,
+  reportNoShow,
+  requestSession,
+  startSession,
+} from './sessions/sessionCallables.js';

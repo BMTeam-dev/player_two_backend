@@ -110,7 +110,7 @@ Já há tipos, regras e índices, mas ainda não há Function para:
 
 | Tarefa | Function prevista | Prepara |
 |---|---|---|
-| 22–23 | ciclo de sessões (pedido, aceite, expiração, conclusão) | `sessions`, `events`, índices de `status` |
+| 23 | expiração de pedidos e avanço/conclusão automáticos das sessões | `sessions`, índices de `status` |
 | 25 | mensagens de sistema e rate limit do chat | `conversations`, `messages` |
 | 29 | avaliações | `reviews`, `stats` do usuário |
 | 31 | `submitReport`, `blockUser` | `reports`, `blocks` |
