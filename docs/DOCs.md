@@ -35,6 +35,7 @@ Este repositório guarda e testa tudo o que roda **dentro** do Firebase:
 | 11 | [Operação e deploy](11-operacao-e-deploy.md) | Rodar local, publicar, branches, custos, incidentes |
 | 12 | [Pontos de atenção](12-pontos-de-atencao.md) | Achados da análise do código e o que vem depois |
 | 13 | [Do código ao Firebase](13-do-codigo-ao-firebase.md) | Como uma função escrita aqui passa a rodar no Firebase: gatilhos, `index.ts`, emulador e deploy |
+| 14 | [Functions de anúncios](14-functions-listings.md) | `upsertListing` e `deactivateListing`: limites, preço só para companion |
 
 ## Mapa rápido
 
@@ -52,6 +53,7 @@ flowchart LR
       EA[expireAvailability<br/>a cada 10 min]
       PW[onPresenceWritten<br/>trigger RTDB]
       SC[syncSearchCards<br/>3 triggers Firestore]
+      LI[upsertListing / deactivateListing<br/>callables]
     end
   end
 
@@ -61,6 +63,8 @@ flowchart LR
   App -- upload avatar --> ST
   App -- chama --> CO
   CO -- cria perfil --> FS
+  App -- chama --> LI
+  LI -- grava anúncio --> FS
   EA -- passa vencidos para offline --> FS
   RTDB -- dispara --> PW
   PW -- isOnline / lastSeenAt --> FS
@@ -79,6 +83,9 @@ flowchart LR
 | `onPlayerGameWrittenSyncCards` | trigger Firestore | southamerica-east1 | escrita em `users/{uid}/games/{gameId}` | [8](08-functions-searchCards.md) |
 | `onListingWrittenSyncCards` | trigger Firestore | southamerica-east1 | escrita em `listings/{id}` | [8](08-functions-searchCards.md) |
 
+> `upsertListing` e `deactivateListing` (tarefa 21, doc [14](14-functions-listings.md))
+> ainda não foram publicadas.
+>
 > As três de `searchCards` foram publicadas em 10/11/2026, e os cartões de
 > quem já tinha perfil foram recalculados (ver [Operação e deploy](11-operacao-e-deploy.md)).
 

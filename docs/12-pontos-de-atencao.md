@@ -92,13 +92,24 @@ Não há projeto de staging. Todo `deploy` vai para os usuários do beta, e a
 projeto `mynoobpro-staging` passa a valer a pena quando entrarem as Functions
 de sessão (tarefa 22), que mexem em dados de duas pessoas.
 
-## 12.10 O que vem depois
+## 12.10 `Listing.ownerSnapshot` sem trigger
+
+**O quê:** `upsertListing` copia nome, avatar e nota do dono para o anúncio
+ao salvar. Se o perfil mudar depois, a cópia fica velha até o próximo
+"Salvar". O `MODELO_DE_DADOS.md` prevê um trigger em `users` para isso.
+
+**Hoje não afeta nada:** o app mostra os anúncios dentro do perfil do dono,
+com os dados do próprio perfil, e não lê `ownerSnapshot`. Passa a importar
+se algum dia houver uma lista de anúncios fora do perfil. Nesse caso, dá
+para atualizar o snapshot dentro da sync de `searchCards`, que já lê os
+anúncios ativos do usuário.
+
+## 12.11 O que vem depois
 
 Já há tipos, regras e índices, mas ainda não há Function para:
 
 | Tarefa | Function prevista | Prepara |
 |---|---|---|
-| 21 | `upsertListing` | `listings`, limite `maxActiveListingsPerUser` |
 | 22–23 | ciclo de sessões (pedido, aceite, expiração, conclusão) | `sessions`, `events`, índices de `status` |
 | 25 | mensagens de sistema e rate limit do chat | `conversations`, `messages` |
 | 29 | avaliações | `reviews`, `stats` do usuário |
