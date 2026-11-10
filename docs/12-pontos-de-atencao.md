@@ -87,10 +87,13 @@ emulador". Hoje a pasta também testa a lógica das Functions.
 
 ## 12.9 Ambiente único
 
-Não há projeto de staging. Todo `deploy` vai para os usuários do beta, e a
-única barreira é `npm test` (ver [doc 11](11-operacao-e-deploy.md)). Um
-projeto `mynoobpro-staging` passa a valer a pena quando entrarem as Functions
-de sessão (tarefa 22), que mexem em dados de duas pessoas.
+Não há projeto de staging. Todo `deploy` vai direto para o projeto real, e a
+única barreira é `npm test` (ver [doc 11](11-operacao-e-deploy.md)).
+
+**Decidido em 10/11/2026:** o staging fica para a tarefa 36, antes de
+convidar os primeiros jogadores do beta. Até lá o projeto só tem contas de
+teste da equipe, e as funções são testadas antes no Emulator Suite. O passo a
+passo está em `decisions.md`, no repo do app.
 
 ## 12.10 `Listing.ownerSnapshot` sem trigger
 
@@ -110,7 +113,6 @@ Já há tipos, regras e índices, mas ainda não há Function para:
 
 | Tarefa | Function prevista | Prepara |
 |---|---|---|
-| 23 | expiração de pedidos e avanço/conclusão automáticos das sessões | `sessions`, índices de `status` |
 | 25 | mensagens de sistema e rate limit do chat | `conversations`, `messages` |
 | 29 | avaliações | `reviews`, `stats` do usuário |
 | 31 | `submitReport`, `blockUser` | `reports`, `blocks` |

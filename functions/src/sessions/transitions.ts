@@ -26,7 +26,10 @@ export const RULES: Record<SessionAction, Rule> = {
   start: { actors: ['requester', 'provider'], from: ['accepted'] },
   markDone: { actors: ['requester', 'provider'], from: ['in_progress'] },
   confirm: { actors: ['requester', 'provider'], from: ['awaiting_confirmation'] },
-  reportNoShow: { actors: ['requester', 'provider'], from: ['accepted', 'in_progress'] },
+  // `awaiting_confirmation` também: a sessão chega lá sozinha pelo horário
+  // (autoAdvanceSessions) mesmo que ninguém tenha aparecido, e o "não
+  // apareceu" é a única objeção antes da conclusão automática.
+  reportNoShow: { actors: ['requester', 'provider'], from: ['accepted', 'in_progress', 'awaiting_confirmation'] },
 };
 
 export interface TransitionInput {
@@ -149,6 +152,11 @@ export async function transitionSession(db: Firestore, uid: string, input: Trans
       case 'reportNoShow':
         if (nowMs < startMs) {
           throw fail('failed-precondition', 'too_early', 'A sessão ainda não começou.');
+        }
+        // Quem já confirmou que a sessão aconteceu não pode dizer depois que
+        // o outro faltou.
+        if (session.status === 'awaiting_confirmation' && session.confirmations[role] != null) {
+          throw fail('failed-precondition', 'invalid_state', 'Você já confirmou esta sessão.');
         }
         outcome = {
           status: 'no_show',

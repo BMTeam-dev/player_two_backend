@@ -282,5 +282,16 @@ describe('sessões (emulador)', () => {
       expect(s.noShow).toMatchObject({ reportedBy: 'alice', absentUid: 'bob' });
       expect(await asyncReasonOf(act('cancel', 'alice', sessionId))).toBe('invalid_state');
     });
+
+    it('"não apareceu" vale em awaiting_confirmation só para quem não confirmou', async () => {
+      const { sessionId } = await request();
+      await act('accept', 'bob', sessionId, at(1 * MIN));
+      await act('start', 'bob', sessionId, at(2 * MIN));
+      await act('markDone', 'bob', sessionId, at(60 * MIN));
+      // Bob marcou "terminamos" (já confirmou): não pode dizer que Alice faltou.
+      expect(await asyncReasonOf(act('reportNoShow', 'bob', sessionId, at(61 * MIN)))).toBe('invalid_state');
+      await act('reportNoShow', 'alice', sessionId, at(62 * MIN));
+      expect((await session(sessionId)).noShow).toMatchObject({ reportedBy: 'alice', absentUid: 'bob' });
+    });
   });
 });

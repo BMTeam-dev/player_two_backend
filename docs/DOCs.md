@@ -36,7 +36,7 @@ Este repositório guarda e testa tudo o que roda **dentro** do Firebase:
 | 12 | [Pontos de atenção](12-pontos-de-atencao.md) | Achados da análise do código e o que vem depois |
 | 13 | [Do código ao Firebase](13-do-codigo-ao-firebase.md) | Como uma função escrita aqui passa a rodar no Firebase: gatilhos, `index.ts`, emulador e deploy |
 | 14 | [Functions de anúncios](14-functions-listings.md) | `upsertListing` e `deactivateListing`: limites, preço só para companion |
-| 15 | [Functions de sessão](15-functions-sessions.md) | `requestSession` e as 7 transições: máquina de estados, limites, mensagens de sistema |
+| 15 | [Functions de sessão](15-functions-sessions.md) | `requestSession`, as 7 transições e as 3 agendadas: máquina de estados, limites, mensagens de sistema |
 
 ## Mapa rápido
 
@@ -56,6 +56,7 @@ flowchart LR
       SC[syncSearchCards<br/>3 triggers Firestore]
       LI[upsertListing / deactivateListing<br/>callables]
       SE[requestSession + 7 transições<br/>callables]
+      SA[expireSessionRequests / autoAdvance / autoComplete<br/>agendadas]
     end
   end
 
@@ -69,6 +70,7 @@ flowchart LR
   LI -- grava anúncio --> FS
   App -- chama --> SE
   SE -- sessão, eventos, conversa --> FS
+  SA -- transições pelo relógio --> FS
   EA -- passa vencidos para offline --> FS
   RTDB -- dispara --> PW
   PW -- isOnline / lastSeenAt --> FS
@@ -90,8 +92,8 @@ flowchart LR
 > `upsertListing` e `deactivateListing` (tarefa 21, doc [14](14-functions-listings.md))
 > ainda não foram publicadas.
 >
-> As 8 callables de sessão (tarefa 22, doc [15](15-functions-sessions.md)) também
-> ainda não foram publicadas.
+> As 8 callables de sessão (tarefa 22) e as 3 agendadas de sessão (tarefa 23,
+> doc [15](15-functions-sessions.md#155-transições-automáticas-tarefa-23)) também ainda não foram publicadas.
 >
 > As três de `searchCards` foram publicadas em 10/11/2026, e os cartões de
 > quem já tinha perfil foram recalculados (ver [Operação e deploy](11-operacao-e-deploy.md)).

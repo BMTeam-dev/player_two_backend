@@ -55,7 +55,8 @@ limpa as coleções no `beforeEach` e passa um `NOW` fixo.
 | `mirrorPresence.test.ts` | `mirrorPresence` | [7](07-function-onPresenceWritten.md#75-testes) |
 | `searchCards.test.ts` | `syncUserCards` | [8](08-functions-searchCards.md#86-testes) |
 | `listings.test.ts` | `parseListingInput`, `saveListing`, `deactivateListing` | [14](14-functions-listings.md#145-testes) |
-| `sessions.test.ts` | `parseRequestInput`, `requestExpiresAtMs`, `createSessionRequest`, `parseTransitionInput`, `transitionSession` | [15](15-functions-sessions.md#156-testes) |
+| `sessions.test.ts` | `parseRequestInput`, `requestExpiresAtMs`, `createSessionRequest`, `parseTransitionInput`, `transitionSession` | [15](15-functions-sessions.md#157-testes) |
+| `scheduledSessions.test.ts` | `expireSessionRequests`, `autoAdvanceSessions`, `autoCompleteSessions` | [15](15-functions-sessions.md#157-testes) |
 
 ## 10.3 Por que a lógica recebe `db` e `now`
 
