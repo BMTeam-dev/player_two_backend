@@ -8,7 +8,7 @@ import {
   initializeTestEnvironment,
   type RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { deleteDoc, doc, getDoc, setDoc, updateDoc, serverTimestamp, Timestamp, writeBatch } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 
 let env: RulesTestEnvironment;
@@ -96,6 +96,44 @@ describe('users', () => {
     await assertSucceeds(updateDoc(doc(as(ALICE), `users/${ALICE}`), { displayName: 'Alice Nova', bio: 'Oi' }));
   });
 
+  it('dono edita todos os campos da tela "Editar perfil" de uma vez', async () => {
+    await assertSucceeds(
+      updateDoc(doc(as(ALICE), `users/${ALICE}`), {
+        displayName: 'Alice',
+        bio: 'Jogo de suporte',
+        region: 'RJ',
+        languages: ['pt', 'en'],
+        platforms: ['pc', 'playstation'],
+        hasMic: false,
+        playstyles: ['chill', 'teaching'],
+      }),
+    );
+  });
+
+  it('recusa campos editáveis fora dos limites', async () => {
+    const ref = doc(as(ALICE), `users/${ALICE}`);
+    await assertFails(updateDoc(ref, { bio: 'x'.repeat(301) }));
+    await assertFails(updateDoc(ref, { displayName: 'A' }));
+    await assertFails(updateDoc(ref, { region: 'SPX' }));
+    await assertFails(updateDoc(ref, { languages: ['fr'] }));
+    await assertFails(updateDoc(ref, { platforms: ['atari'] }));
+    await assertFails(updateDoc(ref, { playstyles: ['rage'] }));
+    await assertFails(updateDoc(ref, { hasMic: 'sim' }));
+  });
+
+  it('não deixa o perfil sem idioma ou sem plataforma', async () => {
+    const ref = doc(as(ALICE), `users/${ALICE}`);
+    await assertFails(updateDoc(ref, { languages: [] }));
+    await assertFails(updateDoc(ref, { platforms: [] }));
+  });
+
+  it('dono NÃO altera username, gameIds ou profileCompletedAt', async () => {
+    const ref = doc(as(ALICE), `users/${ALICE}`);
+    await assertFails(updateDoc(ref, { username: 'outro' }));
+    await assertFails(updateDoc(ref, { gameIds: ['valorant'] }));
+    await assertFails(updateDoc(ref, { profileCompletedAt: serverTimestamp() }));
+  });
+
   it('dono NÃO altera stats, status ou companionStatus', async () => {
     const ref = doc(as(ALICE), `users/${ALICE}`);
     await assertFails(updateDoc(ref, { 'stats.ratingAvg': 5 }));
@@ -160,6 +198,34 @@ describe('users/{uid}/games', () => {
     await assertSucceeds(
       setDoc(doc(as(ALICE), `users/${ALICE}/games/valorant`), { ...playerGame, updatedAt: serverTimestamp() }),
     );
+  });
+
+  it('troca o jogo principal numa escrita só (batch)', async () => {
+    await env.withSecurityRulesDisabled(async ctx => {
+      const db = ctx.firestore();
+      await setDoc(doc(db, 'games/lol'), { id: 'lol', name: 'LoL' });
+      await setDoc(doc(db, `users/${ALICE}/games/valorant`), { ...playerGame, updatedAt: new Date() });
+      await setDoc(doc(db, `users/${ALICE}/games/lol`), { ...playerGame, gameId: 'lol', isMain: false, updatedAt: new Date() });
+    });
+    const db = as(ALICE);
+    const batch = writeBatch(db);
+    batch.update(doc(db, `users/${ALICE}/games/lol`), { isMain: true, updatedAt: serverTimestamp() });
+    batch.update(doc(db, `users/${ALICE}/games/valorant`), { isMain: false, updatedAt: serverTimestamp() });
+    await assertSucceeds(batch.commit());
+  });
+
+  it('updatedAt tem que ser o horário do servidor', async () => {
+    await assertFails(
+      setDoc(doc(as(ALICE), `users/${ALICE}/games/valorant`), { ...playerGame, updatedAt: Timestamp.now() }),
+    );
+  });
+
+  it('dono remove o próprio jogo; ninguém remove o de outra pessoa', async () => {
+    await env.withSecurityRulesDisabled(async ctx => {
+      await setDoc(doc(ctx.firestore(), `users/${ALICE}/games/valorant`), { ...playerGame, updatedAt: new Date() });
+    });
+    await assertFails(deleteDoc(doc(as(BOB), `users/${ALICE}/games/valorant`)));
+    await assertSucceeds(deleteDoc(doc(as(ALICE), `users/${ALICE}/games/valorant`)));
   });
 
   it('não aceita jogo fora do catálogo', async () => {
