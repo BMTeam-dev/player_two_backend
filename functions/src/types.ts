@@ -255,6 +255,10 @@ export interface SearchCard {
   availabilityState: AvailabilityState;
   availabilityRank: number;
   availabilityExpiresAt: TimestampLike | null;
+  // Só preenchidos quando availabilityState = 'window' (o cartão mostra
+  // "sáb 20h–23h" em vez de um genérico "horário marcado").
+  availabilityWindowStart: TimestampLike | null;
+  availabilityWindowEnd: TimestampLike | null;
   isOnline: boolean;
   isCompanion: boolean;
   listingId: string | null;
