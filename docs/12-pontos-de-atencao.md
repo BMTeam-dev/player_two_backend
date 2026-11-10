@@ -2,7 +2,7 @@
 
 [← Índice](DOCs.md)
 
-Achados da leitura do código no commit `3d7b6da`. Nenhum é um bug que quebra
+Achados da leitura do código no commit `3d7b6da` (o mesmo código da `main` em `6e743bc`). Nenhum é um bug que quebra
 o app hoje. São riscos, custos ou inconsistências para resolver ou aceitar
 conscientemente.
 
