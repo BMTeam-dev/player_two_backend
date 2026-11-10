@@ -400,8 +400,10 @@ export interface Conversation {
 export type SystemEvent =
   | 'session_requested'
   | 'session_accepted'
+  | 'session_declined'
   | 'session_cancelled'
   | 'session_completed'
+  | 'session_no_show'
   | 'lfg_member_joined'
   | 'lfg_member_left';
 
