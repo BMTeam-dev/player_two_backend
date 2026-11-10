@@ -162,8 +162,8 @@ busca é **uma** consulta indexada em vez de juntar três coleções no cliente.
 
 ### `listings/{listingId}`: `Listing`
 
-Anúncio "Estou disponível". Ainda não há Function que crie anúncios (tarefa
-21), mas o trigger `onListingWrittenSyncCards` já reage a eles e o seed cria
+Anúncio "Estou disponível". Escrito só por `upsertListing` e
+`deactivateListing` (doc [14](14-functions-listings.md)). O seed também cria
 alguns no emulador.
 
 ### RTDB `status/{uid}`: `Presence`

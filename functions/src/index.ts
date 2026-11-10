@@ -8,6 +8,7 @@ import './globalOptions.js';
 export { completeOnboarding } from './users/completeOnboarding.js';
 export { expireAvailability } from './availability/expireAvailability.js';
 export { onPresenceWritten } from './presence/onPresenceWritten.js';
+export { deactivateListing, upsertListing } from './listings/listingCallables.js';
 export {
   onListingWrittenSyncCards,
   onPlayerGameWrittenSyncCards,

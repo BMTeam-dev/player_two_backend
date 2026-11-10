@@ -142,7 +142,7 @@ folga para diferença de relógio. O valor fica fixo na regra porque ler
   inteira**. O app sempre inclui esse filtro.
 
 #### `listings/{listingId}`
-- Leitura: autenticados. Escrita: ninguém (`upsertListing`/`deactivateListing`, tarefa 21).
+- Leitura: autenticados. Escrita: ninguém (`upsertListing`/`deactivateListing`, doc [14](14-functions-listings.md)).
 
 #### `lfgPosts/{postId}` e `members/{memberUid}`
 - v0.1, mas já protegidos: leitura por autenticados, escrita por ninguém.
