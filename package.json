@@ -15,11 +15,13 @@
     "emulators:fresh": "npm run build && firebase emulators:start",
     "dev:bootstrap": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 tsx scripts/bootstrap.ts",
     "dev:seed": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 tsx scripts/seed-dev.ts",
+    "dev:rebuild-cards": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 tsx scripts/rebuild-search-cards.ts",
 
     "test": "firebase emulators:exec --project demo-mynoobpro --only firestore \"vitest run\"",
 
     "db:deploy": "firebase deploy --only firestore:rules,firestore:indexes,database,storage",
     "db:bootstrap": "tsx scripts/bootstrap.ts --prod",
+    "db:rebuild-cards": "tsx scripts/rebuild-search-cards.ts --prod",
     "functions:deploy": "firebase deploy --only functions"
   },
   "devDependencies": {
