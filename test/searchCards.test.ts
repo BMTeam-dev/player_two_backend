@@ -118,6 +118,21 @@ describe('syncUserCards', () => {
     });
   });
 
+  it('janela de horário vai para o cartão só nos jogos escolhidos', async () => {
+    const start = Timestamp.fromMillis(NOW.toMillis() + 2 * 60 * 60_000);
+    const end = Timestamp.fromMillis(NOW.toMillis() + 4 * 60 * 60_000);
+    await db.doc('users/a').update({
+      availability: { state: 'window', gameIds: ['valorant'], windowStart: start, windowEnd: end, expiresAt: end, note: null },
+    });
+    await sync();
+    expect(await card('valorant')).toMatchObject({
+      availabilityState: 'window',
+      availabilityWindowStart: start,
+      availabilityWindowEnd: end,
+    });
+    expect(await card('lol')).toMatchObject({ availabilityWindowStart: null, availabilityWindowEnd: null });
+  });
+
   it('não escreve nada quando nada mudou', async () => {
     await sync();
     expect(await sync()).toEqual({ written: 0, deleted: 0, gameIdsChanged: false });

@@ -53,6 +53,8 @@ export function buildCard({ user, playerGame, game, listing, updatedAt }: CardIn
     availabilityState,
     availabilityRank: AVAILABILITY_RANK[availabilityState],
     availabilityExpiresAt: availableHere ? availability.expiresAt : null,
+    availabilityWindowStart: availableHere ? availability.windowStart : null,
+    availabilityWindowEnd: availableHere ? availability.windowEnd : null,
     isOnline: user.isOnline,
     isCompanion: user.companionStatus === 'approved',
     listingId: listing?.id ?? null,
