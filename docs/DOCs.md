@@ -88,12 +88,13 @@ flowchart LR
 | `onUserWrittenSyncCards` | trigger Firestore | southamerica-east1 | escrita em `users/{uid}` | [8](08-functions-searchCards.md) |
 | `onPlayerGameWrittenSyncCards` | trigger Firestore | southamerica-east1 | escrita em `users/{uid}/games/{gameId}` | [8](08-functions-searchCards.md) |
 | `onListingWrittenSyncCards` | trigger Firestore | southamerica-east1 | escrita em `listings/{id}` | [8](08-functions-searchCards.md) |
+| `upsertListing`, `deactivateListing` | callable (HTTPS) | southamerica-east1 | app, tela de anúncio | [14](14-functions-listings.md) |
+| `requestSession` e as 7 transições | callable (HTTPS) | southamerica-east1 | app, telas de sessão | [15](15-functions-sessions.md) |
+| `expireSessionRequests`, `autoAdvanceSessions` | agendada (Cloud Scheduler) | southamerica-east1 | a cada 10 min | [15](15-functions-sessions.md#155-transições-automáticas-tarefa-23) |
+| `autoCompleteSessions` | agendada (Cloud Scheduler) | southamerica-east1 | a cada 1 h | [15](15-functions-sessions.md#155-transições-automáticas-tarefa-23) |
 
-> `upsertListing` e `deactivateListing` (tarefa 21, doc [14](14-functions-listings.md))
-> ainda não foram publicadas.
->
-> As 8 callables de sessão (tarefa 22) e as 3 agendadas de sessão (tarefa 23,
-> doc [15](15-functions-sessions.md#155-transições-automáticas-tarefa-23)) também ainda não foram publicadas.
+> As de anúncios (tarefa 21) e de sessão (tarefas 22 e 23) foram publicadas em
+> 10/11/2026, só elas (`--only functions:<nomes>`), sem mexer nas que já estavam no ar.
 >
 > As três de `searchCards` foram publicadas em 10/11/2026, e os cartões de
 > quem já tinha perfil foram recalculados (ver [Operação e deploy](11-operacao-e-deploy.md)).

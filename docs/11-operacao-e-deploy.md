@@ -85,9 +85,9 @@ marcada. Sem ela, o login falha com `scope is required but not consented`.
   - A sync de `searchCards` registra `debug` quando muda algo.
 - **Console → Firestore → Índices**: status dos índices.
 - **Cloud Scheduler**: um job por função agendada, `firebase-schedule-<nome>-southamerica-east1`
-  (`expireAvailability` e, depois do deploy da tarefa 23, `expireSessionRequests`,
-  `autoAdvanceSessions` e `autoCompleteSessions`). A conta tem 3 jobs grátis; a partir
-  do 4º, cada um custa US$ 0,10/mês.
+  (`expireAvailability`, `expireSessionRequests`, `autoAdvanceSessions` e
+  `autoCompleteSessions`, desde 10/11/2026). A conta tem 3 jobs grátis; o 4º custa
+  US$ 0,10/mês.
 
 ## 11.4 Branches
 
