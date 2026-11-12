@@ -215,6 +215,8 @@ export interface UserPrivate {
   rateLimit: {
     sessionRequestsWindowStart: TimestampLike | null;
     sessionRequestsCount: number;
+    messagesWindowStart?: TimestampLike | null;
+    messagesCount?: number;
   };
 }
 

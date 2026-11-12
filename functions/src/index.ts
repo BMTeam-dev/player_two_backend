@@ -25,3 +25,4 @@ export {
   startSession,
 } from './sessions/sessionCallables.js';
 export { autoAdvanceSessions, autoCompleteSessions, expireSessionRequests } from './sessions/scheduledSessions.js';
+export { onMessageCreated } from './chat/onMessageCreated.js';
