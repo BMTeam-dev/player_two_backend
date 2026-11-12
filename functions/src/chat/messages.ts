@@ -1,11 +1,13 @@
 import type { Firestore, Timestamp } from 'firebase-admin/firestore';
 import type { AppConfig, Conversation, Message, UserPrivate } from '../types.js';
+import { chatLink, type PushIntent } from '../notifications/push.js';
 import { hasSevereTerm } from './severeTerms.js';
 
 const MINUTE_MS = 60_000;
 const DEFAULT_MESSAGES_PER_MINUTE = 30;
 
-export type MessageOutcome = { result: 'counted' | 'rate_limited' | 'ignored'; flagged: boolean };
+/** `push` = avisos de mensagem nova para os outros participantes, enviados depois da transaction. */
+export type MessageOutcome = { result: 'counted' | 'rate_limited' | 'ignored'; flagged: boolean; push: PushIntent[] };
 
 const millisOf = (v: unknown) => (v && typeof (v as Timestamp).toMillis === 'function' ? (v as Timestamp).toMillis() : null);
 
@@ -35,7 +37,7 @@ export async function handleNewMessage(
     const message = messageSnap.data() as Message | undefined;
     const conversation = conversationSnap.data() as Conversation | undefined;
     if (!message || message.type !== 'text' || !message.senderId || !conversation) {
-      return { result: 'ignored', flagged: false };
+      return { result: 'ignored', flagged: false, push: [] };
     }
 
     const privateRef = db.doc(`users/${message.senderId}/private/data`);
@@ -51,7 +53,7 @@ export async function handleNewMessage(
     const count = windowOpen ? (rate?.messagesCount ?? 0) : 0;
     if (count >= limit) {
       tx.delete(messageRef);
-      return { result: 'rate_limited', flagged: false };
+      return { result: 'rate_limited', flagged: false, push: [] };
     }
     tx.set(
       privateRef,
@@ -83,6 +85,18 @@ export async function handleNewMessage(
       unread,
       updatedAt: now,
     });
-    return { result: 'counted', flagged };
+    const senderName = conversation.participantSnapshots?.[message.senderId]?.displayName ?? 'Nova mensagem';
+    const push: PushIntent[] = conversation.participantIds
+      .filter(uid => uid !== message.senderId)
+      .map(uid => ({
+        to: uid,
+        pref: 'messages',
+        channel: 'messages',
+        title: senderName,
+        body: message.text,
+        link: chatLink(conversationId),
+        tag: `chat_${conversationId}`,
+      }));
+    return { result: 'counted', flagged, push };
   });
 }
