@@ -113,7 +113,6 @@ Já há tipos, regras e índices, mas ainda não há Function para:
 
 | Tarefa | Function prevista | Prepara |
 |---|---|---|
-| 25 | mensagens de sistema e rate limit do chat | `conversations`, `messages` |
 | 29 | avaliações | `reviews`, `stats` do usuário |
 | 31 | `submitReport`, `blockUser` | `reports`, `blocks` |
 | 32 | moderação (banimento) | desabilitar a conta, trancar conversas, esconder cartões |

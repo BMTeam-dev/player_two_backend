@@ -37,6 +37,7 @@ Este repositório guarda e testa tudo o que roda **dentro** do Firebase:
 | 13 | [Do código ao Firebase](13-do-codigo-ao-firebase.md) | Como uma função escrita aqui passa a rodar no Firebase: gatilhos, `index.ts`, emulador e deploy |
 | 14 | [Functions de anúncios](14-functions-listings.md) | `upsertListing` e `deactivateListing`: limites, preço só para companion |
 | 15 | [Functions de sessão](15-functions-sessions.md) | `requestSession`, as 7 transições e as 3 agendadas: máquina de estados, limites, mensagens de sistema |
+| 16 | [Function `onMessageCreated`](16-function-onMessageCreated.md) | Chat: `lastMessage`/`unread`, limite por minuto, filtro de termos graves |
 
 ## Mapa rápido
 
@@ -57,6 +58,7 @@ flowchart LR
       LI[upsertListing / deactivateListing<br/>callables]
       SE[requestSession + 7 transições<br/>callables]
       SA[expireSessionRequests / autoAdvance / autoComplete<br/>agendadas]
+      MC[onMessageCreated<br/>trigger Firestore]
     end
   end
 
@@ -76,6 +78,9 @@ flowchart LR
   PW -- isOnline / lastSeenAt --> FS
   FS -- users, games, listings mudaram --> SC
   SC -- searchCards + gameIds --> FS
+  App -- envia mensagem de texto --> FS
+  FS -- mensagem criada --> MC
+  MC -- lastMessage / unread / flagged --> FS
 ```
 
 ## Functions publicadas hoje
@@ -92,6 +97,7 @@ flowchart LR
 | `requestSession` e as 7 transições | callable (HTTPS) | southamerica-east1 | app, telas de sessão | [15](15-functions-sessions.md) |
 | `expireSessionRequests`, `autoAdvanceSessions` | agendada (Cloud Scheduler) | southamerica-east1 | a cada 10 min | [15](15-functions-sessions.md#155-transições-automáticas-tarefa-23) |
 | `autoCompleteSessions` | agendada (Cloud Scheduler) | southamerica-east1 | a cada 1 h | [15](15-functions-sessions.md#155-transições-automáticas-tarefa-23) |
+| `onMessageCreated` | trigger Firestore | southamerica-east1 | criação em `conversations/{id}/messages/{id}` | [16](16-function-onMessageCreated.md) |
 
 > As de anúncios (tarefa 21) e de sessão (tarefas 22 e 23) foram publicadas em
 > 10/11/2026, só elas (`--only functions:<nomes>`), sem mexer nas que já estavam no ar.
