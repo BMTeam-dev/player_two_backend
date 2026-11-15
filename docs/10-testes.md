@@ -57,6 +57,9 @@ limpa as coleções no `beforeEach` e passa um `NOW` fixo.
 | `listings.test.ts` | `parseListingInput`, `saveListing`, `deactivateListing` | [14](14-functions-listings.md#145-testes) |
 | `sessions.test.ts` | `parseRequestInput`, `requestExpiresAtMs`, `createSessionRequest`, `parseTransitionInput`, `transitionSession` | [15](15-functions-sessions.md#157-testes) |
 | `scheduledSessions.test.ts` | `expireSessionRequests`, `autoAdvanceSessions`, `autoCompleteSessions` | [15](15-functions-sessions.md#157-testes) |
+| `sessionTransitions.test.ts` | A máquina de estados inteira: matriz estado × ação × quem age, corridas e jornadas (tarefa 28) | [15](15-functions-sessions.md#157-testes) |
+| `chat.test.ts` | `hasSevereTerm`, `handleNewMessage` | [16](16-function-onMessageCreated.md) |
+| `push.test.ts` | `sessionPushes`, `sendPushes` | [17](17-push.md) |
 
 ## 10.3 Por que a lógica recebe `db` e `now`
 

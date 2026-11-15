@@ -167,3 +167,28 @@ apareceu, e essa é a única forma de contestar antes da conclusão automática.
 evento e aviso; paginação com 120 pedidos; início e fim pelo horário,
 inclusive a sessão esquecida que passa pelos dois; conclusão após 24 h,
 com sessões meio confirmadas; prazo lido de `config/app`.
+
+`test/sessionTransitions.test.ts` (16 testes, tarefa 28) olha a máquina de
+estados como um todo:
+
+- **Matriz:** os 9 estados × 7 ações × 2 papéis (126 casos) contra uma tabela
+  escrita à mão a partir do MVP.md 6.1, não contra `RULES` (senão o teste só
+  repetiria o código). Transição recusada não grava nada (sessão igual,
+  nenhum evento, nenhuma mensagem); aceita grava um evento com origem,
+  destino e ator. Quem não participa recebe `session_not_found` em tudo.
+  Estados finais não mudam nem pelas agendadas, mesmo com todos os prazos
+  vencidos.
+- **Tempo e confirmação:** prazo do aceite no milissegundo; "começar" 15 min
+  antes; "não apareceu" só a partir do horário, inclusive em sessão que
+  começou cedo; confirmação repetida; "terminamos" já confirma quem tocou.
+- **Corridas** (3 rodadas cada, porque a ordem das transactions varia):
+  aceitar × recusar (só um passa); aceitar × cancelar (sempre termina
+  cancelada: aceita também pode ser cancelada); os dois confirmam juntos
+  (conclui uma vez, uma mensagem); aceite no último instante × expiração;
+  "não apareceu" × conclusão automática; "começar" × início automático.
+- **Jornadas:** do pedido à conclusão automática, do pedido para agora à
+  confirmação manual e do pedido à expiração, conferindo que cada evento sai
+  de onde o anterior chegou.
+
+Os testes de corrida levam alguns segundos cada: o emulador resolve o
+conflito das transactions com espera e nova tentativa.
