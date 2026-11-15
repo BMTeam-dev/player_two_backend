@@ -63,4 +63,4 @@ Tudo numa transaction:
   só um número a mais na aba, zerado quando a pessoa abre a conversa.
 - **O app não sabe que a mensagem foi apagada pelo limite**: ela some da
   conversa. Aceitável para um limite que só flood atinge.
-- **Push de nova mensagem** entra neste mesmo trigger na tarefa 26.
+- **Push de nova mensagem**: enviado por este mesmo trigger, depois da transaction (ver [push](17-push.md)).

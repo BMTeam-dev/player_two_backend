@@ -73,12 +73,33 @@ describe('handleNewMessage (emulador)', () => {
   });
 
   it('atualiza lastMessage e soma não lida só para o outro participante', async () => {
-    expect(await send('m1', 'alice', 'Bora?')).toEqual({ result: 'counted', flagged: false });
+    expect(await send('m1', 'alice', 'Bora?')).toMatchObject({ result: 'counted', flagged: false });
 
     const c = await conversation();
     expect(c.lastMessage).toMatchObject({ text: 'Bora?', senderId: 'alice', type: 'text' });
     expect(c.lastMessage.at.toMillis()).toBe(NOW_MS);
     expect(c.unread).toEqual({ alice: 0, bob: 2 });
+  });
+
+  it('gera o push de mensagem nova só para o outro participante', async () => {
+    await seedConversation({ participantSnapshots: { alice: { displayName: 'Alice', avatarUrl: null } } });
+    const outcome = await send('m1', 'alice', 'Bora?');
+    expect(outcome.push).toEqual([
+      {
+        to: 'bob',
+        pref: 'messages',
+        channel: 'messages',
+        title: 'Alice',
+        body: 'Bora?',
+        link: 'mynoobpro://chat/c1',
+        tag: 'chat_c1',
+      },
+    ]);
+  });
+
+  it('mensagem apagada pelo limite não gera push', async () => {
+    await db.doc('config/app').set({ rateLimits: { messagesPerMinute: 0 } });
+    expect(await send('m1', 'alice', 'oi')).toMatchObject({ result: 'rate_limited', push: [] });
   });
 
   it('ignora mensagem de sistema (a callable já contou)', async () => {
@@ -105,7 +126,7 @@ describe('handleNewMessage (emulador)', () => {
   });
 
   it('marca termo grave com flagged, sem esconder a mensagem', async () => {
-    expect(await send('m1', 'alice', 'vou te matar')).toEqual({ result: 'counted', flagged: true });
+    expect(await send('m1', 'alice', 'vou te matar')).toMatchObject({ result: 'counted', flagged: true });
     expect(await message('m1')).toMatchObject({ flagged: true, text: 'vou te matar' });
     expect((await conversation()).unread.bob).toBe(2);
   });
