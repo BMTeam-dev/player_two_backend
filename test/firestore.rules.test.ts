@@ -319,6 +319,17 @@ describe('messages', () => {
   });
 });
 
+describe('users/{uid}/blocks', () => {
+  it('só o dono lê; ninguém escreve direto (é a Function blockUser)', async () => {
+    await env.withSecurityRulesDisabled(ctx => setDoc(doc(ctx.firestore(), `users/${ALICE}/blocks/${BOB}`), { blockedUid: BOB }));
+    await assertSucceeds(getDoc(doc(as(ALICE), `users/${ALICE}/blocks/${BOB}`)));
+    // Quem foi bloqueado não descobre.
+    await assertFails(getDoc(doc(as(BOB), `users/${ALICE}/blocks/${BOB}`)));
+    await assertFails(setDoc(doc(as(ALICE), `users/${ALICE}/blocks/${CAROL}`), { blockedUid: CAROL }));
+    await assertFails(deleteDoc(doc(as(ALICE), `users/${ALICE}/blocks/${BOB}`)));
+  });
+});
+
 describe('reviews', () => {
   const seedReviews = () =>
     env.withSecurityRulesDisabled(async ctx => {

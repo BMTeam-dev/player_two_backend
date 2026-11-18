@@ -41,6 +41,7 @@ Este repositório guarda e testa tudo o que roda **dentro** do Firebase:
 | 17 | [Push (FCM)](17-push.md) | Quem recebe push em cada evento, tokens, canais e deep links |
 | 18 | [Functions de avaliação](18-functions-reviews.md) | `submitReview` e `revealBlindReviews`: avaliação cega, prazo de 7 dias |
 | 19 | [Functions de estatísticas](19-functions-stats.md) | `stats` do perfil: nota, sessões, taxa de conclusão e tempo de resposta, recontados por triggers |
+| 20 | [Functions de bloquear e denunciar](20-functions-safety.md) | `blockUser`, `unblockUser` e `submitReport`: conversas trancadas, sessões canceladas, evidência, prioridade e limite diário |
 
 ## Mapa rápido
 
@@ -64,6 +65,7 @@ flowchart LR
       MC[onMessageCreated<br/>trigger Firestore]
       RV[submitReview / revealBlindReviews<br/>callable + diária]
       ST2[onSessionWrittenStats / onReviewWrittenStats<br/>triggers Firestore]
+      SF[blockUser / unblockUser / submitReport<br/>callables]
     end
   end
 
@@ -90,6 +92,8 @@ flowchart LR
   RV -- reviews, reviewedBy --> FS
   FS -- sessão ou avaliação mudou --> ST2
   ST2 -- users.stats --> FS
+  App -- chama --> SF
+  SF -- blocks, reports, tranca conversas --> FS
 ```
 
 ## Functions publicadas hoje
@@ -111,6 +115,7 @@ flowchart LR
 | `submitReview` | callable (HTTPS) | southamerica-east1 | app, tela de avaliação | [18](18-functions-reviews.md) |
 | `revealBlindReviews` | agendada (Cloud Scheduler) | southamerica-east1 | todo dia às 04:00 | [18](18-functions-reviews.md#183-revealblindreviews) |
 | `onSessionWrittenStats`, `onReviewWrittenStats` | trigger Firestore | southamerica-east1 | escrita em `sessions/{id}` e `reviews/{id}` | [19](19-functions-stats.md) |
+| `blockUser`, `unblockUser`, `submitReport` | callable (HTTPS) | southamerica-east1 | app: perfil, chat, sessão, avaliação | [20](20-functions-safety.md) |
 
 > As de anúncios (tarefa 21) e de sessão (tarefas 22 e 23) foram publicadas em
 > 10/11/2026, só elas (`--only functions:<nomes>`), sem mexer nas que já estavam no ar.

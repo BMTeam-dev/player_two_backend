@@ -39,6 +39,7 @@ cliente escrevendo campo de servidor.
 | `searchCards` | lê cartão visível e não lê oculto; cliente não escreve |
 | `sessions` | só participantes leem; ninguém altera status direto |
 | `messages` | participante envia a própria mensagem; não envia em nome de outro, nem em conversa trancada, nem mensagem de sistema; não-participante não lê; zera só o próprio `unread` |
+| `users/{uid}/blocks` | só o dono lê; cliente não grava nem apaga |
 | `reviews` | avaliação cega só o autor lê (nem o avaliado); visível qualquer logado lê, inclusive pela consulta do perfil; consulta sem o filtro de `visible` é recusada; cliente não escreve |
 | `reports` | cliente não cria nem lê |
 
@@ -63,6 +64,7 @@ limpa as coleções no `beforeEach` e passa um `NOW` fixo.
 | `push.test.ts` | `sessionPushes`, `sendPushes` | [17](17-push.md) |
 | `reviews.test.ts` | `parseReviewInput`, `submitReview`, `revealBlindReviews` | [18](18-functions-reviews.md#185-testes) |
 | `stats.test.ts` | `sessionStatsUids`, `reviewStatsUid`, `computeStats`, `refreshUserStats` | [19](19-functions-stats.md#195-testes) |
+| `safety.test.ts` | `parseTargetUid`, `blockUser`, `unblockUser`, `parseReportInput`, `priorityOf`, `submitReport` | [20](20-functions-safety.md#203-testes) |
 
 ## 10.3 Por que a lógica recebe `db` e `now`
 
