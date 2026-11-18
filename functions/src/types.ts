@@ -350,11 +350,13 @@ export interface Session {
   conversationId: string;
   requestExpiresAt: TimestampLike;
   respondedAt: TimestampLike | null;
+  // Minutos entre o pedido e a resposta (aceitar ou recusar); null até lá.
+  responseMinutes: number | null;
   startedAt: TimestampLike | null;
   endedAt: TimestampLike | null;
   completedAt: TimestampLike | null;
   confirmations: { requester: TimestampLike | null; provider: TimestampLike | null };
-  cancellation: { by: string; reason: string | null; at: TimestampLike } | null;
+  cancellation: { by: string; reason: string | null; at: TimestampLike; fromStatus: SessionStatus } | null;
   noShow: { reportedBy: string; absentUid: string; at: TimestampLike } | null;
   reviewedBy: { requester: boolean; provider: boolean };
   createdAt: TimestampLike;

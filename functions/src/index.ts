@@ -28,3 +28,4 @@ export { autoAdvanceSessions, autoCompleteSessions, expireSessionRequests } from
 export { onMessageCreated } from './chat/onMessageCreated.js';
 export { onSessionWrittenPush } from './notifications/onSessionWrittenPush.js';
 export { revealBlindReviews, submitReview } from './reviews/reviewFunctions.js';
+export { onReviewWrittenStats, onSessionWrittenStats } from './stats/statsTriggers.js';

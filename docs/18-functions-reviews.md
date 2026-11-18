@@ -82,9 +82,9 @@ no último dia espera até 7 dias a mais para a avaliação aparecer.
 
 ## 18.4 O que fica para outras tarefas
 
-- **`stats.ratingAvg` e `stats.ratingCount`**: tarefa 30. Ainda está em
-  aberto se a média conta só as avaliações visíveis (o que mantém a
-  cegueira: a nota média não pode mudar antes da revelação) ou todas.
+- **`stats.ratingAvg` e `stats.ratingCount`**: tarefa 30, com o trigger
+  `onReviewWrittenStats` ([doc 19](19-functions-stats.md)). Conta só as
+  avaliações visíveis.
 - **Denunciar avaliação** (`ReportTargetType: 'review'`): tarefa 31.
 - **Push** avisando que alguém te avaliou: fora da v0.
 

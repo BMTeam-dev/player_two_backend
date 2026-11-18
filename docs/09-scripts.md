@@ -100,7 +100,24 @@ usuários, mas não compete com os triggers por contenção de transação.
 Note que as escritas do script em `users/{uid}.gameIds` disparam os triggers
 em produção. Eles rodam, não encontram diferença e não escrevem.
 
-## 9.5 `scripts/data/`
+## 9.5 `scripts/rebuild-stats.ts`
+
+Recalcula `users/{uid}.stats` de todos os usuários com **a mesma lógica dos
+triggers** (`refreshUserStats`, de `functions/src/stats/stats.ts`). Ver
+[Functions de estatísticas](19-functions-stats.md).
+
+```bash
+npm run dev:rebuild-stats   # emulador
+npm run db:rebuild-stats    # produção
+```
+
+Quando usar: logo após o primeiro deploy dos triggers de stats (tarefa 30),
+para preencher quem já tinha sessões e avaliações, e depois de mudar a
+fórmula. Roda em série e é idempotente: quem já está certo não é escrito.
+Cada escrita em `users/{uid}` dispara a sync dos `searchCards`, que copiam
+nota e taxa.
+
+## 9.6 `scripts/data/`
 
 ### `config.json`
 

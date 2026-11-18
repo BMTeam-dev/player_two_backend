@@ -153,6 +153,7 @@ describe('sessões (emulador)', () => {
         message: 'Bora subir de elo?',
         conversationId,
         cancellation: null,
+        responseMinutes: null,
       });
       expect(s.scheduledEnd.toMillis()).toBe(NOW_MS + 60 * MIN);
       expect(s.requestExpiresAt.toMillis()).toBe(NOW_MS + 15 * MIN);
@@ -233,8 +234,8 @@ describe('sessões (emulador)', () => {
 
     it('recusar e cancelar (com motivo)', async () => {
       const first = await request();
-      await act('decline', 'bob', first.sessionId);
-      expect((await session(first.sessionId)).status).toBe('declined');
+      await act('decline', 'bob', first.sessionId, at(3 * MIN));
+      expect(await session(first.sessionId)).toMatchObject({ status: 'declined', responseMinutes: 3 });
       expect(await asyncReasonOf(act('cancel', 'alice', first.sessionId))).toBe('invalid_state');
 
       const second = await request();
@@ -242,7 +243,8 @@ describe('sessões (emulador)', () => {
       await act('cancel', 'alice', second.sessionId, at(2 * MIN), 'imprevisto');
       const s = await session(second.sessionId);
       expect(s.status).toBe('cancelled');
-      expect(s.cancellation).toMatchObject({ by: 'alice', reason: 'imprevisto' });
+      expect(s.cancellation).toMatchObject({ by: 'alice', reason: 'imprevisto', fromStatus: 'accepted' });
+      expect(s.responseMinutes).toBe(1);
       const last = (await events(second.sessionId)).at(-1)!;
       expect(last).toMatchObject({ type: 'cancelled', fromStatus: 'accepted', meta: { reason: 'imprevisto' } });
     });
