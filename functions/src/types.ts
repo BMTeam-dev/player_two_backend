@@ -217,6 +217,8 @@ export interface UserPrivate {
     sessionRequestsCount: number;
     messagesWindowStart?: TimestampLike | null;
     messagesCount?: number;
+    reportsWindowStart?: TimestampLike | null;
+    reportsCount?: number;
   };
 }
 
@@ -356,7 +358,8 @@ export interface Session {
   endedAt: TimestampLike | null;
   completedAt: TimestampLike | null;
   confirmations: { requester: TimestampLike | null; provider: TimestampLike | null };
-  cancellation: { by: string; reason: string | null; at: TimestampLike; fromStatus: SessionStatus } | null;
+  // `by: null` = cancelada pelo sistema (bloqueio, tarefa 31), não por um participante.
+  cancellation: { by: string | null; reason: string | null; at: TimestampLike; fromStatus: SessionStatus } | null;
   noShow: { reportedBy: string; absentUid: string; at: TimestampLike } | null;
   reviewedBy: { requester: boolean; provider: boolean };
   createdAt: TimestampLike;

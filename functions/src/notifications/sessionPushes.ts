@@ -45,7 +45,8 @@ export function sessionPushes(before: SessionFields | null, after: SessionFields
     return [{ ...base, to: after.requesterId, pref: 'sessionUpdates', channel: 'sessions', ...message }];
   }
 
-  if (after.status === 'cancelled' && after.cancellation) {
+  // `by: null` = cancelada por bloqueio: avisar o bloqueado só confirmaria o bloqueio.
+  if (after.status === 'cancelled' && after.cancellation?.by) {
     const by = after.cancellation.by;
     const to = by === after.requesterId ? after.providerId : after.requesterId;
     const wasRequest = before.status === 'requested';
