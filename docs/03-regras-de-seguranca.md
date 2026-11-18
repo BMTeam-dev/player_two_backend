@@ -172,7 +172,7 @@ folga para diferença de relógio. O valor fica fixo na regra porque ler
 
 #### `reviews/{reviewId}`
 - Leitura: autenticados, se `visible == true`, **ou** o próprio autor (vê a avaliação antes da revelação).
-- Escrita: ninguém (tarefa 29). Avaliação **cega**: fica invisível até os dois lados avaliarem ou o prazo vencer.
+- Escrita: ninguém; só a Function `submitReview` ([18](18-functions-reviews.md)). Avaliação **cega**: fica invisível até os dois lados avaliarem ou o prazo vencer.
 - Na consulta de lista, vale a mesma regra de `searchCards`: precisa de `where('visible', '==', true)`.
 
 #### `reports/{reportId}` e `moderationActions/{actionId}`
