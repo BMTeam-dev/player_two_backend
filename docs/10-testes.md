@@ -39,6 +39,7 @@ cliente escrevendo campo de servidor.
 | `searchCards` | lê cartão visível e não lê oculto; cliente não escreve |
 | `sessions` | só participantes leem; ninguém altera status direto |
 | `messages` | participante envia a própria mensagem; não envia em nome de outro, nem em conversa trancada, nem mensagem de sistema; não-participante não lê; zera só o próprio `unread` |
+| `reviews` | avaliação cega só o autor lê (nem o avaliado); visível qualquer logado lê, inclusive pela consulta do perfil; consulta sem o filtro de `visible` é recusada; cliente não escreve |
 | `reports` | cliente não cria nem lê |
 
 ### Lógica das Functions
@@ -60,6 +61,7 @@ limpa as coleções no `beforeEach` e passa um `NOW` fixo.
 | `sessionTransitions.test.ts` | A máquina de estados inteira: matriz estado × ação × quem age, corridas e jornadas (tarefa 28) | [15](15-functions-sessions.md#157-testes) |
 | `chat.test.ts` | `hasSevereTerm`, `handleNewMessage` | [16](16-function-onMessageCreated.md) |
 | `push.test.ts` | `sessionPushes`, `sendPushes` | [17](17-push.md) |
+| `reviews.test.ts` | `parseReviewInput`, `submitReview`, `revealBlindReviews` | [18](18-functions-reviews.md#185-testes) |
 
 ## 10.3 Por que a lógica recebe `db` e `now`
 

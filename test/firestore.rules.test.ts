@@ -8,7 +8,21 @@ import {
   initializeTestEnvironment,
   type RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { deleteDoc, doc, getDoc, setDoc, updateDoc, serverTimestamp, Timestamp, writeBatch } from 'firebase/firestore';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+  serverTimestamp,
+  setDoc,
+  Timestamp,
+  updateDoc,
+  where,
+  writeBatch,
+} from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 
 let env: RulesTestEnvironment;
@@ -302,6 +316,43 @@ describe('messages', () => {
     await assertFails(
       setDoc(doc(as(ALICE), 'conversations/c1/messages/m5'), { ...message('m5', ALICE), type: 'system' }),
     );
+  });
+});
+
+describe('reviews', () => {
+  const seedReviews = () =>
+    env.withSecurityRulesDisabled(async ctx => {
+      const db = ctx.firestore();
+      const base = { sessionId: 's1', targetId: BOB, rating: 5, tags: [], comment: null, createdAt: new Date() };
+      await setDoc(doc(db, 'reviews/s1_alice'), { ...base, id: 's1_alice', authorId: ALICE, visible: false });
+      await setDoc(doc(db, 'reviews/s0_carol'), { ...base, id: 's0_carol', sessionId: 's0', authorId: CAROL, visible: true });
+    });
+
+  it('avaliação cega: só o autor lê; nem o avaliado vê antes da hora', async () => {
+    await seedReviews();
+    await assertSucceeds(getDoc(doc(as(ALICE), 'reviews/s1_alice')));
+    await assertFails(getDoc(doc(as(BOB), 'reviews/s1_alice')));
+    await assertFails(getDoc(doc(as(CAROL), 'reviews/s1_alice')));
+  });
+
+  it('visível: qualquer logado lê, inclusive pela consulta do perfil', async () => {
+    await seedReviews();
+    await assertSucceeds(getDoc(doc(as(ALICE), 'reviews/s0_carol')));
+    await assertFails(getDoc(doc(anon(), 'reviews/s0_carol')));
+    await assertSucceeds(
+      getDocs(query(collection(as(ALICE), 'reviews'), where('targetId', '==', BOB), where('visible', '==', true), orderBy('createdAt', 'desc'))),
+    );
+    // Sem o filtro de `visible`, a consulta poderia trazer uma cega: a regra recusa.
+    await assertFails(getDocs(query(collection(as(CAROL), 'reviews'), where('targetId', '==', BOB))));
+  });
+
+  it('cliente não cria, edita nem apaga avaliação (é a Function submitReview)', async () => {
+    await seedReviews();
+    await assertFails(
+      setDoc(doc(as(BOB), 'reviews/s1_bob'), { id: 's1_bob', sessionId: 's1', authorId: BOB, targetId: ALICE, rating: 5, visible: true }),
+    );
+    await assertFails(updateDoc(doc(as(ALICE), 'reviews/s1_alice'), { visible: true }));
+    await assertFails(deleteDoc(doc(as(ALICE), 'reviews/s1_alice')));
   });
 });
 
