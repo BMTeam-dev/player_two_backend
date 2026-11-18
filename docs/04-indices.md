@@ -92,6 +92,8 @@ igualdade combinando os índices de campo único.
 | `conversations` | `participantIds` contém | `lastMessage.at ↓` | Lista de conversas, a mais recente primeiro |
 | `reviews` | `targetId`, `visible` | `createdAt ↓` | Avaliações visíveis no perfil de alguém |
 | `reviews` | `visible` | `createdAt ↑` | Job que publica avaliações (janela dupla-cega) |
+| `reviews` | `targetId`, `visible` | `rating ↑` | `average('rating')` das stats ([19](19-functions-stats.md)) |
+| `sessions` | `providerId` | `responseMinutes ↑` | `average('responseMinutes')` das stats ([19](19-functions-stats.md)) |
 | `reports` | `status` | `priority ↓`, `createdAt ↑` | Fila de moderação |
 
 ## 4.6 Consultas das Functions de hoje

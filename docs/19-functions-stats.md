@@ -46,9 +46,18 @@ documentos contados. Em troca:
 - é **idempotente**. Um trigger repetido ou fora de ordem não deixa um
   número errado para sempre: o próximo recálculo acerta;
 - o **mesmo código** corrige o histórico (`npm run db:rebuild-stats`);
-- **nenhuma consulta precisa de índice composto**. Todas usam só filtros de
-  igualdade (e `array-contains`), e o Firestore junta os índices de campo
-  único (documentação de agregação do Firestore).
+- as consultas de `count()` usam só filtros de igualdade (e
+  `array-contains`) e não precisam de índice composto: o Firestore junta os
+  índices de campo único.
+
+**Mas `average()` precisa de índice composto com o campo da média.** São
+dois: `reviews (targetId, visible, rating)` e `sessions (providerId,
+responseMinutes)`, ambos em `firestore.indexes.json`. A documentação de
+agregação do Firestore diz o contrário, e o emulador não cobra índice
+nenhum, então os testes passaram. O erro só apareceu no primeiro
+`db:rebuild-stats` em produção, em 18/11/2026, com `FAILED_PRECONDITION:
+The query requires an index`. Até os índices ficarem prontos, os dois
+triggers também falham.
 
 `refreshUserStats` compara com o que já está no perfil e só grava se mudou.
 Gravar em `users/{uid}` dispara a sync dos `searchCards`, que copiam nota e
