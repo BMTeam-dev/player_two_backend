@@ -205,6 +205,7 @@ export async function createSessionRequest(db: Firestore, requesterId: string, i
       conversationId: conversationRef.id,
       requestExpiresAt: new Date(requestExpiresAtMs(nowMs, input.scheduledStartMs, ttl)),
       respondedAt: null,
+      responseMinutes: null,
       startedAt: null,
       endedAt: null,
       completedAt: null,

@@ -62,6 +62,7 @@ limpa as coleções no `beforeEach` e passa um `NOW` fixo.
 | `chat.test.ts` | `hasSevereTerm`, `handleNewMessage` | [16](16-function-onMessageCreated.md) |
 | `push.test.ts` | `sessionPushes`, `sendPushes` | [17](17-push.md) |
 | `reviews.test.ts` | `parseReviewInput`, `submitReview`, `revealBlindReviews` | [18](18-functions-reviews.md#185-testes) |
+| `stats.test.ts` | `sessionStatsUids`, `reviewStatsUid`, `computeStats`, `refreshUserStats` | [19](19-functions-stats.md#195-testes) |
 
 ## 10.3 Por que a lógica recebe `db` e `now`
 

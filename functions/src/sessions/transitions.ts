@@ -87,6 +87,9 @@ export async function transitionSession(db: Firestore, uid: string, input: Trans
     const actorName = session.participantSnapshots[uid]?.displayName ?? 'Alguém';
     const otherUid = role === 'provider' ? session.requesterId : session.providerId;
     const startMs = millisOf(session.scheduledStart);
+    // Tempo de resposta do provider, para `stats.avgResponseMinutes` (tarefa 30).
+    const responseMinutes = () =>
+      session.createdAt ? Math.round((nowMs - millisOf(session.createdAt as unknown as Timestamp)) / 60_000) : null;
     let outcome: Outcome;
 
     switch (input.action) {
@@ -98,7 +101,7 @@ export async function transitionSession(db: Firestore, uid: string, input: Trans
         }
         outcome = {
           status: 'accepted',
-          fields: { respondedAt: now },
+          fields: { respondedAt: now, responseMinutes: responseMinutes() },
           event: 'accepted',
           message: { systemEvent: 'session_accepted', text: `${actorName} aceitou a sessão.` },
         };
@@ -106,7 +109,7 @@ export async function transitionSession(db: Firestore, uid: string, input: Trans
       case 'decline':
         outcome = {
           status: 'declined',
-          fields: { respondedAt: now },
+          fields: { respondedAt: now, responseMinutes: responseMinutes() },
           event: 'declined',
           message: { systemEvent: 'session_declined', text: `${actorName} recusou o pedido.` },
         };
@@ -114,7 +117,9 @@ export async function transitionSession(db: Firestore, uid: string, input: Trans
       case 'cancel':
         outcome = {
           status: 'cancelled',
-          fields: { cancellation: { by: uid, reason: input.reason, at: now } },
+          // `fromStatus`: cancelar um pedido ainda não aceito não pesa na taxa
+          // de conclusão; cancelar uma sessão já combinada pesa (stats.ts).
+          fields: { cancellation: { by: uid, reason: input.reason, at: now, fromStatus: session.status } },
           event: 'cancelled',
           message: { systemEvent: 'session_cancelled', text: `${actorName} cancelou a sessão.` },
         };

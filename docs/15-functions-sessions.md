@@ -145,8 +145,10 @@ apareceu, e essa é a única forma de contestar antes da conclusão automática.
 ## 15.6 O que fica para outras tarefas
 
 - **Push** de pedido recebido e aceito: trigger de `sessions` (tarefa 26).
-- **`stats`** (`sessionsCompleted`, `completionRate`): trigger de
-  `sessions` (tarefa 30).
+- **`stats`** (`sessionsCompleted`, `completionRate`, `avgResponseMinutes`):
+  trigger `onSessionWrittenStats` (tarefa 30, [doc 19](19-functions-stats.md)).
+  Para ele, aceitar e recusar gravam `responseMinutes`, e cancelar grava
+  `cancellation.fromStatus`.
 - **Telas**: tarefa 24.
 
 ## 15.7 Testes
