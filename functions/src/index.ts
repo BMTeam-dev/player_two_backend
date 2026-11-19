@@ -30,3 +30,4 @@ export { onSessionWrittenPush } from './notifications/onSessionWrittenPush.js';
 export { revealBlindReviews, submitReview } from './reviews/reviewFunctions.js';
 export { onReviewWrittenStats, onSessionWrittenStats } from './stats/statsTriggers.js';
 export { blockUser, submitReport, unblockUser } from './safety/safetyCallables.js';
+export { onUserStatusChanged } from './moderation/onUserStatusChanged.js';
