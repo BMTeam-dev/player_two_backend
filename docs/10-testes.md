@@ -65,6 +65,7 @@ limpa as coleções no `beforeEach` e passa um `NOW` fixo.
 | `reviews.test.ts` | `parseReviewInput`, `submitReview`, `revealBlindReviews` | [18](18-functions-reviews.md#185-testes) |
 | `stats.test.ts` | `sessionStatsUids`, `reviewStatsUid`, `computeStats`, `refreshUserStats` | [19](19-functions-stats.md#195-testes) |
 | `safety.test.ts` | `parseTargetUid`, `blockUser`, `unblockUser`, `parseReportInput`, `priorityOf`, `submitReport` | [20](20-functions-safety.md#203-testes) |
+| `moderation.test.ts` | `statusChange`, `restrictUser`, `restoreUser` (Auth falso injetado) | [21](21-function-moderation.md#216-testes) |
 
 ## 10.3 Por que a lógica recebe `db` e `now`
 
