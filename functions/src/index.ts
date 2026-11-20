@@ -6,6 +6,7 @@ import './globalOptions.js';
 
 // As Functions entram aqui bloco a bloco (TASKS.md).
 export { completeOnboarding } from './users/completeOnboarding.js';
+export { deleteAccount } from './users/deleteAccount.js';
 export { expireAvailability } from './availability/expireAvailability.js';
 export { onPresenceWritten } from './presence/onPresenceWritten.js';
 export { deactivateListing, upsertListing } from './listings/listingCallables.js';
