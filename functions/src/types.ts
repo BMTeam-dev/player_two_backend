@@ -399,7 +399,7 @@ export interface Conversation {
   lastMessage: { text: string; senderId: string | null; type: MessageType; at: TimestampLike } | null;
   unread: Record<string, number>;
   lockedAt: TimestampLike | null;
-  lockedReason: 'block' | 'moderation' | 'lfg_closed' | null;
+  lockedReason: 'block' | 'moderation' | 'account_deleted' | 'lfg_closed' | null;
   createdAt: TimestampLike;
   updatedAt: TimestampLike;
 }

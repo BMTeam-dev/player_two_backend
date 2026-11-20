@@ -43,6 +43,7 @@ Este repositório guarda e testa tudo o que roda **dentro** do Firebase:
 | 19 | [Functions de estatísticas](19-functions-stats.md) | `stats` do perfil: nota, sessões, taxa de conclusão e tempo de resposta, recontados por triggers |
 | 20 | [Functions de bloquear e denunciar](20-functions-safety.md) | `blockUser`, `unblockUser` e `submitReport`: conversas trancadas, sessões canceladas, evidência, prioridade e limite diário |
 | 21 | [Function `onUserStatusChanged`](21-function-moderation.md) | Moderação: suspender ou banir pelo Console tranca conversas, cancela sessões, desativa anúncios e a conta |
+| 22 | [Function `deleteAccount`](22-function-deleteAccount.md) | Exclusão de conta: o que apaga, o que anonimiza e o que mantém |
 
 ## Mapa rápido
 
@@ -122,6 +123,7 @@ flowchart LR
 | `onSessionWrittenStats`, `onReviewWrittenStats` | trigger Firestore | southamerica-east1 | escrita em `sessions/{id}` e `reviews/{id}` | [19](19-functions-stats.md) |
 | `blockUser`, `unblockUser`, `submitReport` | callable (HTTPS) | southamerica-east1 | app: perfil, chat, sessão, avaliação | [20](20-functions-safety.md) |
 | `onUserStatusChanged` | trigger Firestore | southamerica-east1 | `users/{uid}.status` muda (moderação no Console) | [21](21-function-moderation.md) |
+| `deleteAccount` | callable (HTTPS) | southamerica-east1 | app: Meu perfil → "Excluir conta" | [22](22-function-deleteAccount.md) |
 
 > As de anúncios (tarefa 21) e de sessão (tarefas 22 e 23) foram publicadas em
 > 10/11/2026, só elas (`--only functions:<nomes>`), sem mexer nas que já estavam no ar.

@@ -54,6 +54,22 @@ export function statusChange(
  * idempotente: repetir não cancela nem tranca nada duas vezes.
  */
 export async function restrictUser(db: Firestore, auth: ModerationAuth, uid: string, now: Timestamp) {
+  const result = await cutContact(db, uid, 'moderation', now);
+  await disableAuth(auth, uid, true);
+  await auth.revokeRefreshTokens(uid).catch(ignoreMissingAuthUser);
+  return result;
+}
+
+/**
+ * Passos 1 a 4 de `restrictUser`, sem o Auth: também usado pela exclusão de
+ * conta (users/accountDeletion.ts), que tranca com `account_deleted`.
+ */
+export async function cutContact(
+  db: Firestore,
+  uid: string,
+  lockedReason: NonNullable<Conversation['lockedReason']>,
+  now: Timestamp,
+) {
   // Só consultas que já têm índice composto (firestore.indexes.json): a
   // moderação não pode falhar por índice faltando (aconteceu na tarefa 30).
   const [conversations, ...sessionSnaps] = await Promise.all([
@@ -79,7 +95,7 @@ export async function restrictUser(db: Firestore, auth: ModerationAuth, uid: str
   let locked = 0;
   for (const doc of conversations.docs) {
     if ((doc.data() as Conversation).lockedAt == null) {
-      writes.push(b => b.update(doc.ref, { lockedAt: now, lockedReason: 'moderation', updatedAt: now }));
+      writes.push(b => b.update(doc.ref, { lockedAt: now, lockedReason, updatedAt: now }));
       locked++;
     }
   }
@@ -113,9 +129,6 @@ export async function restrictUser(db: Firestore, auth: ModerationAuth, uid: str
     await batch.commit();
   }
 
-  await disableAuth(auth, uid, true);
-  await auth.revokeRefreshTokens(uid).catch(ignoreMissingAuthUser);
-
   return { locked, cancelled, listingsDeactivated: listings.size };
 }
 
@@ -134,7 +147,7 @@ async function disableAuth(auth: ModerationAuth, uid: string, disabled: boolean)
 }
 
 // Perfis de seed/teste não têm conta no Auth; o resto da moderação vale igual.
-function ignoreMissingAuthUser(error: unknown) {
+export function ignoreMissingAuthUser(error: unknown) {
   if ((error as { code?: string } | null)?.code !== 'auth/user-not-found') {
     throw error;
   }
